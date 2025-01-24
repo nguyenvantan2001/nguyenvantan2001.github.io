@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio cá nhân của Nguyễn Văn Tân, nhà thiết kế UX và đồ họa sáng tạo.">
+    <title>Portfolio Nguyễn Văn Tân</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            background: linear-gradient(to right, #1c1c3c, #3a3a68);
+            color: #fff;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #ffcc00;
+            font-weight: 600;
+        }
+
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 400px;
+            background: url(https://truongthinh.info/wp-content/uploads/2022/01/13/19/50-hinh-anh-dep-thien-nhien-anh-phong-canh-dep-3d-chat-luong-4k-9.jpg) center/cover no-repeat;
+            position: relative;
+        }
+
+        .hero-section::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0000002b;
+            z-index: 1;
+        }
+
+        .hero-section h2,
+        .hero-section p,
+        .hero-section .btn {
+            position: relative;
+            z-index: 2;
+            color: #ffcc00;
+        }
+
+        .hero-section h2 {
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+
+        .hero-section p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .hero-section .btn {
+            padding: 10px 20px;
+            background: linear-gradient(to right, #ff5722, #e64a19);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 5px;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .hero-section .btn:hover {
+            background: linear-gradient(to right, #e64a19, #d84315);
+            transform: scale(1.05);
+        }
+
+        section {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #ffcc00;
+        }
+
+        .project img {
+            max-width: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffcc00;
+        }
+        #header {
+    position: relative;
+    overflow: hidden;
+}
+
+    </style>
+    
+</head>
+<body>
+    <header id="header">
+        <h1>✨ Nguyễn Văn Tân ✨</h1>
+        <nav>
+            <ul>
+                <li><a href="#about">Giới thiệu</a></li>
+                <li><a href="#projects">Dự án</a></li>
+                <li><a href="#contact">Liên hệ</a></li>
+            </ul>
+        </nav>
+        <canvas id="fireworksCanvas"></canvas>
+    </header>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const header = document.getElementById("header");
+            const canvas = document.getElementById("fireworksCanvas");
+            const ctx = canvas.getContext("2d");
+
+            function resizeCanvas() {
+                canvas.width = header.clientWidth;
+                canvas.height = header.clientHeight;
+            }
+
+            resizeCanvas();
+            window.addEventListener("resize", resizeCanvas);
+
+            class Firework {
+                constructor(x, y, targetY) {
+                    this.x = x;
+                    this.y = y;
+                    this.targetY = targetY;
+                    this.speed = Math.random() * 4 + 3;
+                    this.particles = [];
+                    this.exploded = false;
+                }
+
+                update() {
+                    if (this.y > this.targetY && !this.exploded) {
+                        this.y -= this.speed;
+                    } else if (!this.exploded) {
+                        this.exploded = true;
+                        for (let i = 0; i < 50; i++) {
+                            this.particles.push(new Particle(this.x, this.y));
+                        }
+                    }
+                }
+
+                draw() {
+                    if (!this.exploded) {
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                        ctx.fillStyle = "white";
+                        ctx.fill();
+                    } else {
+                        this.particles.forEach((particle, index) => {
+                            particle.update();
+                            particle.draw();
+                            if (particle.alpha <= 0) {
+                                this.particles.splice(index, 1);
+                            }
+                        });
+                    }
+                }
+            }
+
+            class Particle {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.speedX = Math.random() * 4 - 2;
+                    this.speedY = Math.random() * 4 - 2;
+                    this.alpha = 1;
+                    this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                }
+
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+                    this.alpha -= 0.02;
+                }
+
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            const fireworks = [];
+
+            function createFirework() {
+                fireworks.push(new Firework(Math.random() * canvas.width, canvas.height, Math.random() * canvas.height / 2));
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                fireworks.forEach((firework, index) => {
+                    firework.update();
+                    firework.draw();
+                    if (firework.exploded && firework.particles.length === 0) {
+                        fireworks.splice(index, 1);
+                    }
+                });
+                requestAnimationFrame(animate);
+            }
+
+            setInterval(createFirework, 1000);
+            animate();
+        });
+    </script>
+
+    <section class="hero-section">
+        <h2>Chào mừng đến Portfolio của tôi!</h2>
+        <p>Cùng khám phá hành trình sáng tạo qua các dự án thiết kế UX và đồ họa chuyên nghiệp.</p>
+        <a href="#projects" class="btn">Khám phá dự án</a>
+    </section>
+
+    <section id="about">
+        <h2 class="section-title">Giới thiệu</h2>
+        <p>Tôi là <strong>Nguyễn Văn Tân</strong>, một nhà thiết kế UX và đồ họa đầy đam mê sáng tạo.</p>
+    </section>
+    <section id="projects">
+        <h2 class="section-title">Dự Án</h2>
+        <p>Tôi đã tham gia thiết kế nhiều dự án liên quan đến giao diện người dùng, website và ứng dụng di động. Luôn chú trọng đến trải nghiệm và tính thẩm mỹ.</p>
+    </section>
+
+    <section id="contact">
+        <h2 class="section-title">Liên Hệ</h2>
+        <p>Email: nguyenvantan100521@gmail.com</p>
+        <p>SĐT: 0926294953</p>
+    </section>
+    <footer>
+        <p>&copy; 2025 Nguyễn Văn Tân. Mọi quyền được bảo lưu.</p>
+    </footer>
+</body>
+</html>
